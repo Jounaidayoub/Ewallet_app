@@ -9,12 +9,21 @@ const expensesElement = document.getElementById("monthlyExpenses");
 const activecards = document.getElementById("activeCards");
 const transactionsList = document.getElementById("recentTransactionsList");
 const transferBtn = document.getElementById("quickTransfer");
+const rechargeBtn = document.getElementById("quickTopup");
 const transferSection = document.getElementById("transferPopup");
+const rechargeSection = document.getElementById("rechargePopup");
 const closeTransferBtn = document.getElementById("closeTransferBtn");
 const cancelTransferBtn = document.getElementById("cancelTransferBtn");
 const beneficiarySelect = document.getElementById("beneficiary");
 const sourceCard = document.getElementById("sourceCard");
 const submitTransferBtn = document.getElementById("submitTransferBtn");
+const closeRechargeBtn = document.getElementById("closeRechargeBtn");
+const cancelRechargeBtn = document.getElementById("cancelRechargeBtn");
+const submitRechargeBtn = document.getElementById("submitRechargeBtn");
+
+
+const rechargeSourceCard = document.getElementById("sourceCard-recharge");
+
 
 // Guard
 if (!user) {
@@ -24,9 +33,16 @@ if (!user) {
 
 // Events
 transferBtn.addEventListener("click", handleTransfersection);
+rechargeBtn.addEventListener("click", handleRechargesection);
 closeTransferBtn.addEventListener("click", closeTransfer);
 cancelTransferBtn.addEventListener("click", closeTransfer);
 submitTransferBtn.addEventListener("click", handleTransfer)
+closeRechargeBtn.addEventListener("click", closeRechargesection);
+cancelRechargeBtn.addEventListener("click", closeRechargesection);
+submitRechargeBtn.addEventListener("click", handleRecharge);
+
+
+
 
 
 // Retrieve dashboard data
@@ -86,6 +102,16 @@ function handleTransfersection() {
   document.body.classList.add("popup-open");
 }
 
+function handleRechargesection() {
+  rechargeSection.classList.add("active");
+  document.body.classList.add("popup-open");
+}
+
+function closeRechargesection() {
+  rechargeSection.classList.remove("active");
+  document.body.classList.remove("popup-open");
+}
+
 // Beneficiaries
 const beneficiaries = getbeneficiaries(user.id);
 
@@ -103,7 +129,9 @@ function renderCards() {
     const option = document.createElement("option");
     option.value = card.numcards;
     option.textContent = card.type + "****" + card.numcards;
+    
     sourceCard.appendChild(option);
+    rechargeSourceCard.appendChild(option);
   });
 }
 
@@ -314,6 +342,17 @@ function transfer(expediteur, numcompte, amount) {
       console.log(error);
       alert(error);
     });
+}
+
+
+function handleRecharge(e) {
+  e.preventDefault();
+  
+  const sourceCard = rechargeSourceCard.value;
+  const amount = Number(document.getElementById("amount").value);
+
+  console.log("Recharge amount:", amount);
+  console.log("Selected card:", sourceCard);
 }
 
 
