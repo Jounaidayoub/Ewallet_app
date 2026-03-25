@@ -264,19 +264,38 @@ function checkCardValidty(cardNumber) {
 
 }
 
-function chargerCard(cardNumber) {
+function chargerCard(cardNumber,amount) {
   return new Promise((resolve, reject) => {
-    console.log("Charging card number:", cardNumber);
+
+    const cards = user.wallet.cards;
+
+    const card = cards.find((c) => c.numcards === cardNumber);
+
+
+    card.balance -= amount;
+    // const user = database.users.find((u) => u.id === userId)
+    user.wallet.balance += amount;
+
+
+
+
+
     setTimeout(() => {
-      const isCharged = charger(user.id, cardNumber, amount);
-      if (isCharged) {
+
+
+
+
+
+      const done=updateUserData(user);
+
+      if (done) {
         resolve("Card charged successfully");
       } else {
         reject("Failed to charge the card");
       }
     }, 2000);
   });
-  
+
 }
 
 function handleRecharge(e) {
@@ -292,8 +311,9 @@ function handleRecharge(e) {
   }
 
   checkCardValidty(cardNumber).
-    then(() => chargerCard(cardNumber)).
+    then(() => chargerCard(cardNumber, amount)).
     then(() => renderDashboard()).
+    then(() => {console.log(user)}).
     catch((error) => {
       console.log(error);
       alert(error);
