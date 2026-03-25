@@ -1,4 +1,11 @@
-import { getbeneficiaries, finduserbyaccount, findbeneficiarieByid, updateUserData } from "../Model/database.js";
+import {
+  getbeneficiaries,
+  finduserbyaccount,
+  findbeneficiarieByid,
+  updateUserData,
+  checkcard,
+  charger
+} from "../Model/database.js";
 const user = JSON.parse(sessionStorage.getItem("currentUser"));
 // DOM elements
 const greetingName = document.getElementById("greetingName");
@@ -214,9 +221,9 @@ function transfer(expediteur, numcompte, amount) {
   checkUser(numcompte) //p0
     .then((destinataire) => {//p1
       return checkSolde(expediteur, amount)//p2
-      .then(() =>//p3
-        destinataire
-      );
+        .then(() =>//p3
+          destinataire
+        );
     })
     .then((destinataire) => {
 
@@ -257,6 +264,20 @@ function checkCardValidty(cardNumber) {
 
 }
 
+function chargerCard(cardNumber) {
+  return new Promise((resolve, reject) => {
+    console.log("Charging card number:", cardNumber);
+    setTimeout(() => {
+      const isCharged = charger(user.id, cardNumber, amount);
+      if (isCharged) {
+        resolve("Card charged successfully");
+      } else {
+        reject("Failed to charge the card");
+      }
+    }, 2000);
+  });
+  
+}
 
 function handleRecharge(e) {
   e.preventDefault();
@@ -269,13 +290,14 @@ function handleRecharge(e) {
     alert("Please enter a valid amount");
     return;
   }
-  
+
   checkCardValidty(cardNumber).
-  then(() => { }).
-  catch((error) => {
-    console.log(error);
-    alert(error);
-  });
+    then(() => chargerCard(cardNumber)).
+    then(() => renderDashboard()).
+    catch((error) => {
+      console.log(error);
+      alert(error);
+    });
 
 
   console.log("Recharge amount:", amount);
