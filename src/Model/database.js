@@ -67,6 +67,15 @@ export const finduserbyaccount=(numcompte)=>{
     return database.users.find((u)=>u.account===numcompte);
 }
 
+export const updateUserData = (updatedUser) => {
+    const index = database.users.findIndex(u => u.id === updatedUser.id);
+    if (index !== -1) {
+        database.users[index] = updatedUser;
+        return true;
+    }
+    return false;
+}
+
 
 
 
