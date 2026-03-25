@@ -76,6 +76,26 @@ export const updateUserData = (updatedUser) => {
     return false;
 }
 
+export function checkcard(cardNumber,userid) {
+  const cards = database.users.filter((u) => u.id === userid).wallet.cards;
+
+  const card = cards.find((c) => c.numcards === cardNumber);
+
+  if (!card) {
+    return false;
+  }
+  
+  const diff= new Date(card.expiry) - new Date();
+
+   if(diff<0){
+    return false;
+   }
+
+  return true;
+
+
+}
+
 
 
 

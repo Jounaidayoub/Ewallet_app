@@ -129,7 +129,7 @@ function renderCards() {
     const option = document.createElement("option");
     option.value = card.numcards;
     option.textContent = card.type + "****" + card.numcards;
-    
+
     sourceCard.appendChild(option);
     rechargeSourceCard.appendChild(option);
   });
@@ -137,119 +137,14 @@ function renderCards() {
 
 renderCards();
 
-//###################################  Transfer  #####################################################//
-
-// check function 
-
-/* function checkUser(numcompte, callback) {
-  setTimeout(() => {
-    const destinataire = finduserbyaccount(numcompte);
-    if (destinataire) {
-      callback(destinataire);
-    } else {
-      console.log("Destinataire non trouvé");
-    }
-  }, 500);
-}
-
-function checkSolde(exp, amount, callback) {
-  setTimeout(() => {
-    const solde = exp.wallet.balance;
-    if (solde >= amount) {
-      callback("Solde suffisant");
-    } else {
-      callback("Solde insuffisant");
-    }
-  }, 400);
-}
-
-function updateSolde(exp, destinataire, amount, callback) {
-  setTimeout(() => {  
-    exp.wallet.balance -= amount;
-    destinataire.wallet.balance += amount;
-    callback("Solde mis à jour");
-  }, 300);
-}
-
-
-function addtransactions(exp, destinataire, amount, callback) {
-  setTimeout(() => { 
-    // Transaction pour l'expéditeur (débit)
-    const transactionDebit = {
-      id: Date.now(),
-      type: "debit",
-      amount: amount,
-      from: exp.name,
-      to: destinataire.name,
-      date: new Date().toLocaleDateString()
-    };
-
-    // Transaction pour le destinataire (crédit)
-    const transactionCredit = {
-      id: Date.now() + 1,
-      type: "credit",
-      amount: amount,
-      from: exp.name,
-      to: destinataire.name,
-      date: new Date().toLocaleDateString()
-    };
-
-    user.wallet.transactions.push(transactionDebit);
-    destinataire.wallet.transactions.push(transactionCredit);
-    renderDashboard();
-    callback("Transaction enregistrée");
-  }, 200);
-}
-
-
-export function transferer(exp, numcompte, amount) {
-  console.log("\n DÉBUT DU TRANSFERT ");
-
-  // Étape 1: Vérifier le destinataire
-  checkUser(numcompte, function afterCheckUser(destinataire) {
-    console.log("Étape 1: Destinataire trouvé -", destinataire.name);
-
-    // Étape 2: Vérifier le solde
-    checkSolde(exp, amount, function afterCheckSolde(soldemessage) {
-      console.log(" Étape 2:", soldemessage);
-
-      if (soldemessage.includes("Solde suffisant")) {
-        // Étape 3: Mettre à jour les soldes
-        updateSolde(exp, destinataire, amount, function afterUpdateSolde(updatemessage) {
-          console.log(" Étape 3:", updatemessage);
-
-          // Étape 4: Enregistrer la transaction
-          addtransactions(exp, destinataire, amount, function afterAddTransactions(transactionMessage) {
-            console.log(" Étape 4:", transactionMessage);
-            console.log(`Transfert de ${amount} réussi!`);
-          });
-        });
-      }
-    });
-  });
-}
-
-
-function handleTransfer(e) {
- e.preventDefault();
-  const beneficiaryId = document.getElementById("beneficiary").value;
-  const beneficiaryAccount=findbeneficiarieByid(user.id,beneficiaryId).account;
-  const sourceCard = document.getElementById("sourceCard").value;
-
-  const amount = Number(document.getElementById("amount").value);
-
-  
-  transferer(user, beneficiaryAccount, amount);
-
-} */
 
 function checkUser(numcompte) {
   return new Promise((resolve, reject) => {
     console.log("Checking beneficiary account:", numcompte);
     setTimeout(() => {
-      const beneficiary = finduserbyaccount(numcompte);
-      if (beneficiary) {
-        resolve(beneficiary);
+      const destinataire = finduserbyaccount(numcompte);
+      if (destinataire) {
+        resolve(destinataire);
       } else {
         reject("beneficiary not found");
       }
@@ -316,9 +211,10 @@ function addtransactions(expediteur, destinataire, amount) {
 // **************************************transfer***************************************************//
 
 function transfer(expediteur, numcompte, amount) {
-  checkUser(numcompte)
-    .then((destinataire) => {
-      return checkSolde(expediteur, amount).then(() =>
+  checkUser(numcompte) //p0
+    .then((destinataire) => {//p1
+      return checkSolde(expediteur, amount)//p2
+      .then(() =>//p3
         destinataire
       );
     })
@@ -345,14 +241,45 @@ function transfer(expediteur, numcompte, amount) {
 }
 
 
+function checkCardValidty(cardNumber) {
+
+  return new Promise((resolve, reject) => {
+    console.log("Checking card validity for card number:", cardNumber);
+    setTimeout(() => {
+      const isValid = checkcard(cardNumber, user.id);
+      if (isValid) {
+        resolve("Card is valid");
+      } else {
+        reject("Card is invalid or expired");
+      }
+    }, 2000);
+  });
+
+}
+
+
 function handleRecharge(e) {
   e.preventDefault();
+
+  const cardNumber = rechargeSourceCard.value;
+  console.log("amoutnnt:", document.getElementById("amountrecharge"));
+  const amount = Number(document.getElementById("amountrecharge").value);
+
+  if (amount < 10 || amount > 5000) {
+    alert("Please enter a valid amount");
+    return;
+  }
   
-  const sourceCard = rechargeSourceCard.value;
-  const amount = Number(document.getElementById("amount").value);
+  checkCardValidty(cardNumber).
+  then(() => { }).
+  catch((error) => {
+    console.log(error);
+    alert(error);
+  });
+
 
   console.log("Recharge amount:", amount);
-  console.log("Selected card:", sourceCard);
+  console.log("Selected card:", cardNumber);
 }
 
 
